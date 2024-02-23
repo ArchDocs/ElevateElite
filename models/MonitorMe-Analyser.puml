@@ -1,0 +1,28 @@
+@startuml
+skinparam defaultTextAlignment center
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+
+LAYOUT_WITH_LEGEND()
+
+title MonitorMe Analyser Component Diagram
+
+Container(monitoring_screen_app, "Monitoring screen app", "Container", "")
+Container(stay_healthy_mobile_app, "Stay healthy mobile app", "Container", "")
+Container(message_broker, "Message Broker", "Container", "")
+
+Container_Boundary(cb, "A Container Boundary") {
+Component(analyser, "MonitorMe Analyser","")
+}
+
+Rel(message_broker, analyser, "Stream messages from sensors")
+Rel(analyser, monitoring_screen_app, "Generate alert")
+Rel(analyser, stay_healthy_mobile_app, "Generate alert")
+
+@enduml

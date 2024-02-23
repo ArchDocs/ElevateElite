@@ -1,0 +1,27 @@
+@startuml MonitorMe Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+skinparam defaultTextAlignment center
+skinparam linetype polyline
+
+Person( medicalProfessional, "Medical professional", "Experts working in hospital")
+Person( patient, "Patient", "Admitted in hospital")
+
+System(monitorMe, "MonitorMe", "Medical patient monitoring system for hospitals")
+
+
+'System_Ext(monitortThem, "MonitorThem", "Hospital and patient Data analytics platform")
+System_Ext(mymedicaldata, "MyMedicalData", "Patient medical records system used by doctors, nurses and health professionals")
+System_Ext(stayHealthyMobileApp, "StayHealthy mobile app", "")
+
+Rel_U(monitorMe, patient, "Monitors","", "patients vital signs")
+
+Rel_D(medicalProfessional, monitorMe, "Uses","", "Review patient's vital signs \n Get alert on patient's health \n Generate patient's vital signs snapshot")
+
+Rel(monitorMe, mymedicaldata, "Uploads", "", "Patient's vital signs snapshot")
+Rel_R(monitorMe, stayHealthyMobileApp, "Alerts", "", "on patient health")
+
+Rel_U(stayHealthyMobileApp, medicalProfessional, "Sends",, "alert on patient's health")
+@enduml

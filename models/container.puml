@@ -1,0 +1,50 @@
+@startuml MonitorMe Container
+skinparam defaultTextAlignment center
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+skinparam defaultTextAlignment center
+skinparam linetype polyline
+
+title MonitorMe System Container diagram
+
+'Boundary(p1, "System Users"){
+Person( medicalProfessional, "Medical professional", "Experts working in hospital")
+Person( patient, "Patient", "Admitted in hospital")
+'}
+
+System_Ext(mymedicaldata, "MyMedicalData", "Patient medical records system used by doctors, nurses and health professionals")
+System_Ext(stayHealthyMobileApp, "StayHealthy mobile app", "")
+
+System_Boundary(c1, "MonitorMe System") {
+
+Container(iotConnector, "IoT Connector", "Container: Service", "Enables sensor connectivity and data collection")
+
+Container(streamer, "Streamer", "Container: Service", "Streams events to monitoring screen")
+Container(analyzer, "Analyzer", "Container: Service", "Analyse and generate alert based on sensor data")
+Container(dataProcessor, "Data Processor", "Container: Service", "Process and store data from all sensors")
+Container(patientUploader, "Patient Uploader", "Container: Service", "Uploads patients consolidated vital signs")
+
+Container(messageBroker, "Message Broker", "Container: Kafka", "Enables clients to stream sensor data while persisting it for specific duration")
+Container(sensors, "Sensors", "Physical sensors", "Sensors connected to patient and monitoring key health metrics")
+Container(nurseStation, "Nurse Station", "Physical screen", "Physical station to display patient's health information")
+}
+
+Rel(sensors, iotConnector, "publishes","","Patient's vital signs")
+Rel(iotConnector, messageBroker, "publishes","","Patient's vital signs")
+Rel(messageBroker, analyzer, "streams","","Patient's vital signs")
+Rel(analyzer, stayHealthyMobileApp, "pushes","","alert on patient's health")
+Rel(analyzer, nurseStation, "pushes","","alert on patient's health")
+Rel(streamer, messageBroker, "streams","","Patient's vital signs")
+Rel(streamer, nurseStation, "streams","","Patient's vital signs")
+Rel(dataProcessor, messageBroker, "streams","","Patient's vital signs")
+Rel(nurseStation, patientUploader, "Send","","Patient's vital signs")
+Rel(patientUploader, mymedicaldata, "Upload","","Patient's vital signs")
+
+Rel_D(stayHealthyMobileApp, medicalProfessional, "Sends",, "alert on patient's health")
+Rel_U(medicalProfessional, nurseStation, "monitors","", "Patient's vital signs \n Get alert on patient's health \n Generate patient's vital signs snapshot")
+Rel_U(sensors, patient, "Monitors","", "patients vital signs")
+
+
+@enduml

@@ -1,0 +1,44 @@
+@startuml monitormeiotconnector
+skinparam defaultTextAlignment center
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component diagram for MonitorMe IoT Connector
+
+
+Container_Boundary(c1, "MonitorMe IoT Connector") {
+
+'Backend Applications
+Component(pub_sub_message_broker, "MonitorMe IoT Connector Pub/Sub Message Broker", "Mosquitto broker", "Responsible for streaming in real-time vital signs raw data published from different sensors. Clustering of broker service to serve scalability and availability aspects of the system.")
+Component(topic_transformer, "MonitorMe IoT Connector Topic Transformer", "NodeJS/MQTT client", "Responsible for subscribing to the Pub/Sub Message broker and then publishing the raw data to the new tranformed topic with the patient id.Topic transformation is made possible with the information fetched from Patient to Sensor/Bed mapping.")
+Component(message_publisher, "MonitorMe IoT Connector Message Publisher", "NodeJS/Kafka client", "Responsible for publishing real-time vital signs raw data to central message broker by subscribing to the topic created by the topic transformer component")
+
+}
+
+System_Ext(sensor_devices, "Sensor devices", "Sends vital signs data from patients", $link="https://github.com/plantuml-stdlib/C4-PlantUML")
+Container(patient_sensor_bed_mapping, "Patient to Sensor/Bed Mapping", "Patient to Sensor/Bed mapping component.")
+Container(message_broker, "Message broker", "Recieves the streaming patient vital signs data in real-time")
+
+
+Rel(pub_sub_message_broker, topic_transformer, "Subscribes")
+Rel(topic_transformer, pub_sub_message_broker, "Publishes")
+Rel(pub_sub_message_broker, message_publisher, "Subscribes")
+
+
+
+Rel_U(sensor_devices, pub_sub_message_broker, "Publishes vital signs data from each sensor.")
+Rel_D(topic_transformer, patient_sensor_bed_mapping,"Fetches Patient/Sensor/Bed mapping information.")
+Rel_D(message_publisher, message_broker,"Publishes vital signs data for each patient.")
+
+
+@enduml

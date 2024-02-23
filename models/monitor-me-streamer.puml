@@ -1,0 +1,30 @@
+@startuml MonitorMe Streamer Container diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+title System Container diagram for MonitorMe Streamer
+
+
+System_Boundary(c1, "MonitorMe Streamer") {
+Container(streamer, "MonitorMe Streamer")
+Container(monitoring_screenbe, "MonitorMe Screen BackEnd")
+Container(monitoring_screenfe, "MonitorMe Screen FrontEnd")
+Container(mm_data_upload_generator, "Generate MyMedical Data upload")
+Container(mm_data_queue, "Queue MyMedical Data Upload", "If MyMedical Data is unavailable queue will store the data until uploader can upload the data.")
+Container(mm_data_uploader, "MyMedical Data Uploader")
+}
+
+Container(message_broker, "Message Broker", "Container", "")
+System_Ext(mmdata, "MyMedical Data")
+
+Rel_D(message_broker, streamer, "Subscribes to topics")
+Rel_D(streamer, monitoring_screenbe, "Reads and transforms messages to backend")
+Rel_D(monitoring_screenbe, monitoring_screenfe, "Displays data from backend")
+Rel_D(monitoring_screenbe, mm_data_upload_generator, "Generate Medical Data Upload")
+Rel_D(mm_data_upload_generator, mm_data_queue, "Generator stores the upload package in queue")
+Rel_D(mm_data_queue, mm_data_uploader, "Fetch data from queue and send to MyMedical Data")
+Rel_D(mm_data_uploader, mmdata, "Uploads Medical Data")
+
+
+@enduml
